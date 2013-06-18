@@ -37,6 +37,6 @@ while not brainLoaded:
 			forceReload = True
 
 # Enter the main input/output loop.
-print "\nINTERACTIVE MODE (ctrl-c to exit)"
+print("\nINTERACTIVE MODE (ctrl-c to exit)")
 while(True):
-	print kern.respond(raw_input("> "))
+	print(kern.respond(input("> ")))
