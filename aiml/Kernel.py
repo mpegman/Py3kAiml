@@ -224,7 +224,7 @@ class Kernel:
         substituter.
 
         """
-        inFile = file(filename)
+        inFile = open(filename)
         parser = ConfigParser()
         parser.readfp(inFile, filename)
         inFile.close()
@@ -253,7 +253,7 @@ class Kernel:
     def _deleteSession(self, sessionID):
         """Delete the specified session."""
         if sessionID in self._sessions:
-            _sessions.pop(sessionID)
+            self._sessions.pop(sessionID)
 
     def getSessionData(self, sessionID = None):
         """Return a copy of the session data dictionary for the
@@ -297,13 +297,13 @@ class Kernel:
             if self._verboseMode:
                 print("done (%.2f seconds)" % (time.clock() - start))
 
-    def respond(self, input, sessionID = _globalSessionID):
+    def respond(self, inpt, sessionID = _globalSessionID):
         """Return the Kernel's response to the input string."""
-        if len(input) == 0:
+        if len(inpt) == 0:
             return ""
 
         #ensure that input is a unicode string
-        try: input = input.decode(self._textEncoding, 'replace')
+        try: inpt = inpt.decode(self._textEncoding, 'replace')
         except UnicodeError: pass
         except AttributeError: pass
         
@@ -350,26 +350,26 @@ class Kernel:
     # It does not mess with the input and output histories.  Recursive calls
     # to respond() spawned from tags like <srai> should call this function
     # instead of respond().
-    def _respond(self, input, sessionID):
+    def _respond(self, inpt, sessionID):
         """Private version of respond(), does the real work."""
-        if len(input) == 0:
+        if len(inpt) == 0:
             return ""
 
         # guard against infinite recursion
         inputStack = self.getPredicate(self._inputStack, sessionID)
         if len(inputStack) > self._maxRecursionDepth:
             if self._verboseMode:
-                err = "WARNING: maximum recursion depth exceeded (input='%s')" % input.encode(self._textEncoding, 'replace')
+                err = "WARNING: maximum recursion depth exceeded (input='%s')" % inpt.encode(self._textEncoding, 'replace')
                 sys.stderr.write(err)
             return ""
 
         # push the input onto the input stack
         inputStack = self.getPredicate(self._inputStack, sessionID)
-        inputStack.append(input)
+        inputStack.append(inpt)
         self.setPredicate(self._inputStack, inputStack, sessionID)
 
         # run the input through the 'normal' subber
-        subbedInput = self._subbers['normal'].sub(input)
+        subbedInput = self._subbers['normal'].sub(inpt)
 
         # fetch the bot's previous response, to pass to the match()
         # function as 'that'.
@@ -387,7 +387,7 @@ class Kernel:
         elem = self._brain.match(subbedInput, subbedThat, subbedTopic)
         if elem is None:
             if self._verboseMode:
-                err = "WARNING: No match found for input: %s\n" % input.encode(self._textEncoding)
+                err = "WARNING: No match found for input: %s\n" % inpt.encode(self._textEncoding)
                 sys.stderr.write(err)
         else:
             # Process the element into a response string.
@@ -474,7 +474,7 @@ class Kernel:
         attributes.
 
         """        
-        attr = None
+        attr = None  # @UnusedVariable
         response = ""
         attr = elem[1]
         
@@ -704,7 +704,7 @@ class Kernel:
         response = ""
         for e in elem[2:]:
             response += self._processElement(e, sessionID)
-        return string.lower(response)
+        return response.lower()
 
     # <person>
     def _processPerson(self,elem, sessionID):
@@ -782,9 +782,9 @@ class Kernel:
             response += self._processElement(e, sessionID)
         try:
             response = response.strip()
-            words = string.split(response, " ", 1)
-            words[0] = string.capitalize(words[0])
-            response = string.join(words)
+            words = response.split(" ", 1)
+            words[0] = words[0].capitalize()
+            response = words.join()
             return response
         except IndexError: # response was empty
             return ""
@@ -862,13 +862,13 @@ class Kernel:
         except KeyError: index = 1
         # fetch the user's last input
         inputStack = self.getPredicate(self._inputStack, sessionID)
-        input = self._subbers['normal'].sub(inputStack[-1])
+        inpt = self._subbers['normal'].sub(inputStack[-1])
         # fetch the Kernel's last response (for 'that' context)
         outputHistory = self.getPredicate(self._outputHistory, sessionID)
         try: that = self._subbers['normal'].sub(outputHistory[-1])
         except: that = "" # there might not be any output yet
         topic = self.getPredicate("topic", sessionID)
-        response = self._brain.star("star", input, that, topic, index)
+        response = self._brain.star("star", inpt, that, topic, index)
         return response
     
     # <system>
@@ -911,7 +911,7 @@ class Kernel:
         time.sleep(0.01) # I'm told this works around a potential IOError exception.
         for line in out:
             response += line + "\n"
-        response = string.join(response.splitlines()).strip()
+        response = response.splitlines().join().strip()
         return response
 
     # <template>
@@ -1000,13 +1000,13 @@ class Kernel:
         except KeyError: index = 1
         # fetch the user's last input
         inputStack = self.getPredicate(self._inputStack, sessionID)
-        input = self._subbers['normal'].sub(inputStack[-1])
+        inpt = self._subbers['normal'].sub(inputStack[-1])
         # fetch the Kernel's last response (for 'that' context)
         outputHistory = self.getPredicate(self._outputHistory, sessionID)
         try: that = self._subbers['normal'].sub(outputHistory[-1])
         except: that = "" # there might not be any output yet
         topic = self.getPredicate("topic", sessionID)
-        response = self._brain.star("thatstar", input, that, topic, index)
+        response = self._brain.star("thatstar", inpt, that, topic, index)
         return response
 
     # <think>
@@ -1041,13 +1041,13 @@ class Kernel:
         except KeyError: index = 1
         # fetch the user's last input
         inputStack = self.getPredicate(self._inputStack, sessionID)
-        input = self._subbers['normal'].sub(inputStack[-1])
+        inpt = self._subbers['normal'].sub(inputStack[-1])
         # fetch the Kernel's last response (for 'that' context)
         outputHistory = self.getPredicate(self._outputHistory, sessionID)
         try: that = self._subbers['normal'].sub(outputHistory[-1])
         except: that = "" # there might not be any output yet
         topic = self.getPredicate("topic", sessionID)
-        response = self._brain.star("topicstar", input, that, topic, index)
+        response = self._brain.star("topicstar", inpt, that, topic, index)
         return response
 
     # <uppercase>
@@ -1062,7 +1062,7 @@ class Kernel:
         response = ""
         for e in elem[2:]:
             response += self._processElement(e, sessionID)
-        return string.upper(response)
+        return response.upper()
 
     # <version>
     def _processVersion(self,elem, sessionID):
@@ -1078,7 +1078,7 @@ class Kernel:
 ##################################################
 ### Self-test functions follow                 ###
 ##################################################
-def _testTag(kern, tag, input, outputList):
+def _testTag(kern, tag, inpt, outputList):
     """Tests 'tag' by feeding the Kernel 'input'.  If the result
     matches any of the strings in 'outputList', the test passes.
     
@@ -1086,7 +1086,7 @@ def _testTag(kern, tag, input, outputList):
     global _numTests, _numPassed
     _numTests += 1
     print("Testing <" + tag + ">:", end=' ')
-    response = kern.respond(input).decode(kern._textEncoding)
+    response = kern.respond(inpt).decode(kern._textEncoding)
     if response in outputList:
         print("PASSED")
         _numPassed += 1

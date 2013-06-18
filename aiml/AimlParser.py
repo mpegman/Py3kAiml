@@ -1,8 +1,8 @@
 from xml.sax.handler import ContentHandler
 from xml.sax.xmlreader import Locator
 import sys
-import xml.sax
-import xml.sax.handler
+import xml.sax  # @UnusedImport
+import xml.sax.handler  # @UnusedImport
 
 class AimlParserError(Exception): pass
 
@@ -98,7 +98,7 @@ class AimlHandler(ContentHandler):
 	def startElementNS(self, name, qname, attr):
 		print("QNAME:", qname)
 		print("NAME:", name)
-		uri,elem = name
+		uri,elem = name  # @UnusedVariable
 		if (elem == "bot"): print("name:", attr.getValueByQName("name"), "a'ite?")
 		self.startElement(elem, attr)
 		pass
@@ -223,7 +223,8 @@ class AimlHandler(ContentHandler):
 				attrDict[k.encode(self._encoding)] = str(v)
 			self._validateElemStart(name, attrDict, self._version)
 			# Push the current element onto the element stack.
-			self._elemStack.append([name.encode(self._encoding),attrDict])
+			#self._elemStack.append([name.encode(self._encoding),attrDict])
+			self._elemStack.append([name,attrDict])
 			self._pushWhitespaceBehavior(attr)
 			# If this is a condition element, push a new entry onto the
 			# foundDefaultLiStack
@@ -272,7 +273,7 @@ class AimlHandler(ContentHandler):
 			try:
 				parent = self._elemStack[-1][0]
 				parentAttr = self._elemStack[-1][1]
-				required, optional, canBeParent = self._validInfo[parent]
+				required, optional, canBeParent = self._validInfo[parent]  # @UnusedVariable
 				nonBlockStyleCondition = (parent == "condition" and not ("name" in parentAttr and "value" in parentAttr))
 				if not canBeParent:
 					raise AimlParserError(("Unexpected text inside <%s> element "%parent)+self._location())
@@ -306,7 +307,7 @@ class AimlHandler(ContentHandler):
 			pass
 
 	def endElementNS(self, name, qname):
-		uri, elem = name
+		uri, elem = name  # @UnusedVariable
 		self.endElement(elem)
 		
 	def endElement(self, name):
@@ -457,7 +458,7 @@ class AimlHandler(ContentHandler):
 		# Check the element's attributes.  Make sure that all required
 		# attributes are present, and that any remaining attributes are
 		# valid options.		
-		required, optional, canBeParent = self._validInfo[name]
+		required, optional, canBeParent = self._validInfo[name]  # @UnusedVariable
 		for a in required:
 			if a not in attr and not self._forwardCompatibleMode:
 				raise AimlParserError(("Required \"%s\" attribute missing in <%s> element " % (a,name))+self._location())
