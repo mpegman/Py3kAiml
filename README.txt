@@ -1,3 +1,8 @@
+Updating the code for Python 3.2
+
+Jason Ayres
+
+
 PyAIML -- The Python AIML Interpreter
 author: Cort Stratton (cort@users.sourceforge.net)
 web: http://pyaiml.sourceforge.net/
