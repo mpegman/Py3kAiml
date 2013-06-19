@@ -35,7 +35,7 @@ class PatternMgr:
 
 		"""
 		# Collapse a multi-word name into a single word
-		self._botName = str(name.split().join())
+		self._botName = str(" ".join(name.split()))
 
 	def dump(self):
 		"""Print all learned patterns, for debugging purposes."""
@@ -238,9 +238,9 @@ class PatternMgr:
 		# extract the star words from the original, unmutilated input.
 		if foundTheRightStar:
 			#print string.join(pattern.split()[start:end+1])
-			if starType == 'star': return pattern.split()[start:end+1].join()
-			elif starType == 'thatstar': return that.split()[start:end+1].join()
-			elif starType == 'topicstar': return topic.split()[start:end+1].join()
+			if starType == 'star': return " ".join(pattern.split()[start:end+1])
+			elif starType == 'thatstar': return " ".join(that.split()[start:end+1])
+			elif starType == 'topicstar': return " ".join(topic.split()[start:end+1])
 		else: return ""
 
 	def _match(self, words, thatWords, topicWords, root):

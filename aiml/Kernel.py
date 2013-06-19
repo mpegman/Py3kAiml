@@ -784,7 +784,7 @@ class Kernel:
             response = response.strip()
             words = response.split(" ", 1)
             words[0] = words[0].capitalize()
-            response = words.join()
+            response = " ".join(words)
             return response
         except IndexError: # response was empty
             return ""
@@ -911,7 +911,7 @@ class Kernel:
         time.sleep(0.01) # I'm told this works around a potential IOError exception.
         for line in out:
             response += line + "\n"
-        response = response.splitlines().join().strip()
+        response = " ".join(response.splitlines()).strip()
         return response
 
     # <template>
