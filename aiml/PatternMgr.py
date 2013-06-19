@@ -183,7 +183,7 @@ class PatternMgr:
 		words = None
 		if starType == 'star':
 			patMatch = patMatch[:patMatch.index(self._THAT)]
-			words = input.split()
+			words = inpt.split()
 		elif starType == 'thatstar':
 			patMatch = patMatch[patMatch.index(self._THAT)+1 : patMatch.index(self._TOPIC)]
 			words = thatInput.split()

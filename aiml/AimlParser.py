@@ -220,7 +220,8 @@ class AimlHandler(ContentHandler):
 			attrDict = {}
 			for k,v in list(attr.items()):
 				#attrDict[k[1].encode(self._encoding)] = v.encode(self._encoding)
-				attrDict[k.encode(self._encoding)] = str(v)
+				#attrDict[k.encode(self._encoding)] = str(v)  # This makes the attr's bytes, and they don't work with comparing strings.
+				attrDict[str(k)] = str(v)
 			self._validateElemStart(name, attrDict, self._version)
 			# Push the current element onto the element stack.
 			#self._elemStack.append([name.encode(self._encoding),attrDict])
@@ -544,3 +545,19 @@ def create_parser():
 	parser.setContentHandler(handler)
 	#parser.setFeature(xml.sax.handler.feature_namespaces, True)
 	return parser
+
+def main():
+	parser = create_parser()
+	handler = parser.getContentHandler()
+	handler.setEncoding("utf-8")
+	try:
+		parser.parse("C:\\Users\\jason\\My Workspaces.new\\In-House\\pyaiml-3\\test.aiml")
+	except xml.sax.SAXException as msg:
+		err = "\nFATAL PARSE ERROR in file :\n%s\n" % (msg)
+		sys.stderr.write(err)
+		
+	for key, tem in handler.categories.items():
+		print("Key = %s, tem = %s" % (key, tem))
+
+if __name__ == '__main__':
+	main()

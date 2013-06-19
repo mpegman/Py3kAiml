@@ -303,9 +303,10 @@ class Kernel:
             return ""
 
         #ensure that input is a unicode string
-        try: inpt = inpt.decode(self._textEncoding, 'replace')
-        except UnicodeError: pass
-        except AttributeError: pass
+        if sys.version_info.major <3:
+            try: inpt = inpt.decode(self._textEncoding, 'replace')
+            except UnicodeError: pass
+            except AttributeError: pass
         
         # prevent other threads from stomping all over us.
         self._respondLock.acquire()
@@ -314,7 +315,7 @@ class Kernel:
         self._addSession(sessionID)
 
         # split the input into discrete sentences
-        sentences = Utils.sentences(input)
+        sentences = Utils.sentences(inpt)
         finalResponse = ""
         for s in sentences:
             # Add the input to the history list before fetching the
@@ -343,8 +344,13 @@ class Kernel:
         
         # release the lock and return
         self._respondLock.release()
-        try: return finalResponse.encode(self._textEncoding)
-        except UnicodeError: return finalResponse
+        try: 
+            if sys.version_info.major < 3:
+                return finalResponse.encode(self._textEncoding)
+            else:
+                return finalResponse
+        except UnicodeError: 
+            return finalResponse
 
     # This version of _respond() just fetches the response for some input.
     # It does not mess with the input and output histories.  Recursive calls

@@ -39,4 +39,6 @@ while not brainLoaded:
 # Enter the main input/output loop.
 print("\nINTERACTIVE MODE (ctrl-c to exit)")
 while(True):
-	print(kern.respond(input("> ")))
+	inpt = input("> ")
+	
+	print(kern.respond(inpt))
